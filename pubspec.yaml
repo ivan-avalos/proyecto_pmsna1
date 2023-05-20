@@ -10,9 +10,18 @@ dependencies:
   flutter:
     sdk: flutter
 
+  provider: ^6.0.5
+  shared_preferences: ^2.1.1
+  lottie: ^2.3.2
+  concentric_transition: ^1.0.3
+  social_login_buttons: ^1.0.7
+  image_picker: ^0.8.7
+  path: ^1.8.3
+  email_validator: ^2.1.17
   firebase_core: ^2.13.0
   firebase_auth: ^4.6.1
   firebase_messaging: ^14.6.1
+  firebase_storage: ^11.2.1
   cloud_firestore: ^4.7.1
 
 dev_dependencies:
@@ -22,3 +31,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/
