@@ -1,0 +1,24 @@
+name: linkchat
+description: Un chat para compartir tus links.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  firebase_core: ^2.13.0
+  firebase_auth: ^4.6.1
+  firebase_messaging: ^14.6.1
+  cloud_firestore: ^4.7.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
