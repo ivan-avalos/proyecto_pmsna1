@@ -4,11 +4,13 @@ class ThemeSettings {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     primaryColor: Colors.purple,
+    fontFamily: 'Manrope',
   );
 
-  static ThemeData darkTheme = ThemeData.dark(
+  static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
-  ).copyWith(
+    brightness: Brightness.dark,
+    fontFamily: 'Manrope',
     colorScheme: const ColorScheme.dark().copyWith(
       primary: Colors.purple,
     ),
