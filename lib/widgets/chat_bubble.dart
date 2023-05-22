@@ -46,6 +46,7 @@ class BubbleLeft extends StatelessWidget {
             color: Color(0xFFE1E1E2),
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               LinkPreview(message),
               Link(
