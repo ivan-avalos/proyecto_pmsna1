@@ -23,6 +23,8 @@ dependencies:
   firebase_messaging: ^14.6.1
   firebase_storage: ^11.2.1
   cloud_firestore: ^4.7.1
+  custom_clippers: ^2.0.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../firebase/auth.dart';
 import '../providers/theme_provider.dart';
 import '../settings/themes.dart';
+import '../widgets/recent_chats.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,8 +31,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SliverAppBar.large(
             title: const Text('Inicio'),
           ),
-          const SliverFillRemaining(
-            child: Placeholder(),
+          SliverFillRemaining(
+            hasScrollBody: true,
+            child: RecentChats(),
           ),
         ],
       ),

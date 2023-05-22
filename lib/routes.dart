@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:linkchat/screens/chat_screen.dart';
+import 'package:linkchat/screens/new_chat_screen.dart';
 
 import 'screens/dashboard_screen.dart';
 import 'screens/login_screen.dart';
@@ -10,6 +12,8 @@ Map<String, WidgetBuilder> getApplicationRoutes() {
     '/login': (BuildContext context) => const LoginScreen(),
     '/register': (BuildContext context) => const RegisterScreen(),
     '/onboard': (BuildContext context) => const OnboardingScreen(),
-    '/dash': (BuildContext context) => const DashboardScreen()
+    '/dash': (BuildContext context) => const DashboardScreen(),
+    '/new': (BuildContext context) => const NewChatScreen(),
+    '/chat': (BuildContext context) => const ChatScreen(),
   };
 }

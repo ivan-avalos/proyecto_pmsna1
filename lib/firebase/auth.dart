@@ -2,13 +2,17 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:linkchat/firebase/database.dart';
 
+import '../models/user.dart';
 import 'storage.dart';
 
 class Auth {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GithubAuthProvider _githubProvider = GithubAuthProvider();
   final GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
+
+  final Database _db = Database();
 
   User? get currentUser => _auth.currentUser;
 
@@ -25,8 +29,16 @@ class Auth {
       );
       User? user = cred.user;
       if (user != null) {
-        user.updateDisplayName(displayName);
-        user.updatePhotoURL(await Storage().uploadAvatar(user.uid, avatar));
+        String photoUrl = await Storage().uploadAvatar(user.uid, avatar);
+        await user.updateDisplayName(displayName);
+        await user.updatePhotoURL(photoUrl);
+        // Store user in database
+        _db.saveUser(FsUser(
+          uid: user.uid,
+          displayName: displayName,
+          photoUrl: photoUrl,
+          email: user.email!,
+        ));
       }
       return true;
     } catch (e) {
