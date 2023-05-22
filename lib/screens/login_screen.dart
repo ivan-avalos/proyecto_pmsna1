@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen>
         isLoading = false;
       });
       // TODO: checar si el resultado es true
-      Navigator.of(context).pushNamed('/dash');
+      Navigator.of(context).pushReplacementNamed('/dash');
     });
   }
 
@@ -127,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen>
         isLoading = false;
       });
       if (success) {
-        Navigator.of(context).pushNamed('/dash');
+        Navigator.of(context).pushReplacementNamed('/dash');
       }
     });
   }
@@ -138,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen>
         isLoading = false;
       });
       if (success) {
-        Navigator.of(context).pushNamed('/dash');
+        Navigator.of(context).pushReplacementNamed('/dash');
       }
     });
   }

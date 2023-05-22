@@ -52,19 +52,18 @@ class LinkChat extends StatelessWidget {
     final ThemeProvider provider = context.watch<ThemeProvider>();
     final ThemeData? theme = provider.theme;
     provider.syncFromPrefs();
-    return MaterialApp(
-        theme: theme ?? ThemeSettings.lightTheme,
-        darkTheme: theme ?? ThemeSettings.darkTheme,
-        themeMode: ThemeMode.system,
-        routes: getApplicationRoutes(),
-        // initialRoute: '/login',
-        home: StreamBuilder(
-          stream: _auth.userChanges,
-          builder: (context, snapshot) {
-            return (snapshot.hasData && !snapshot.data!.isAnonymous)
+    return StreamBuilder(
+        stream: _auth.userChanges,
+        builder: (context, snapshot) {
+          return MaterialApp(
+            theme: theme ?? ThemeSettings.lightTheme,
+            darkTheme: theme ?? ThemeSettings.darkTheme,
+            themeMode: ThemeMode.system,
+            routes: getApplicationRoutes(),
+            home: (snapshot.hasData && !snapshot.data!.isAnonymous)
                 ? const DashboardScreen()
-                : const LoginScreen();
-          },
-        ));
+                : const LoginScreen(),
+          );
+        });
   }
 }

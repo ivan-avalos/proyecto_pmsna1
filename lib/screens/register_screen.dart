@@ -169,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         )
             .then((success) {
           if (success) {
-            Navigator.of(context).pushNamed('/onboard');
+            Navigator.of(context).pushReplacementNamed('/onboard');
           }
         });
       }
