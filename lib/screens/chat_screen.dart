@@ -22,6 +22,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final Auth _auth = Auth();
   final Database _db = Database();
 
+  final ScrollController _scroll = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     List<dynamic> arguments =
@@ -64,8 +66,17 @@ class _ChatScreenState extends State<ChatScreen> {
         stream: _db.getMessagesByGroupId(group!.id!),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_scroll.hasClients) {
+                _scroll.animateTo(_scroll.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.fastOutSlowIn);
+              }
+            });
+
             List<Message> msgs = snapshot.data!;
             return ListView.builder(
+              controller: _scroll,
               padding: const EdgeInsets.only(bottom: 80.0),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) => ChatBubble(

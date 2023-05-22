@@ -3,6 +3,7 @@ import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
 import 'package:linkchat/models/message.dart';
 import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum ChatBubbleAlignment { start, end }
 
@@ -122,45 +123,47 @@ class LinkPreview extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Card(
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  message.linkPhotoURL != null
-                      // ? FadeInImage(
-                      //         placeholder: const AssetImage('assets/loading.gif'),
-                      //         image: NetworkImage(message.linkPhotoURL!),
-                      //         imageErrorBuilder: (context, error, stackTrace) =>
-                      //             const SizedBox.shrink(),
-                      //         fit: BoxFit.fill,
-                      //       )
-                      ? CachedNetworkImage(
-                          imageUrl: message.linkPhotoURL!,
-                          placeholder: (context, url) =>
-                              Image.asset('assets/loading.gif'),
-                          errorWidget: (context, url, error) =>
-                              const SizedBox.shrink(),
-                        )
-                      : const SizedBox.shrink(),
-                  message.linkTitle != null
-                      ? Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            message.linkTitle!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                  message.linkDescription != null
-                      ? Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-                          child: Text(message.linkDescription!),
-                        )
-                      : const SizedBox.shrink(),
-                ],
+              semanticContainer: true,
+              child: InkWell(
+                onTap: () {
+                  launchUrl(
+                    Uri.parse(message.messageText),
+                    mode: LaunchMode.externalApplication,
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    message.linkPhotoURL != null
+                        ? CachedNetworkImage(
+                            imageUrl: message.linkPhotoURL!,
+                            placeholder: (context, url) =>
+                                Image.asset('assets/loading.gif'),
+                            errorWidget: (context, url, error) =>
+                                const SizedBox.shrink(),
+                          )
+                        : const SizedBox.shrink(),
+                    message.linkTitle != null
+                        ? Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              message.linkTitle!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    message.linkDescription != null
+                        ? Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                            child: Text(message.linkDescription!),
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
               ),
             ),
           )
