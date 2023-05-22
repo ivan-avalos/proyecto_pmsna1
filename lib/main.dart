@@ -1,7 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:linkchat/screens/dashboard_screen.dart';
+import 'package:linkchat/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase/auth.dart';
 import 'providers/theme_provider.dart';
 import 'routes.dart';
 import 'settings/themes.dart';
@@ -34,13 +37,15 @@ class _MainContentState extends State<MainContent> {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: const LinkChat(),
+      child: LinkChat(),
     );
   }
 }
 
 class LinkChat extends StatelessWidget {
-  const LinkChat({super.key});
+  final Auth _auth = Auth();
+
+  LinkChat({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +53,18 @@ class LinkChat extends StatelessWidget {
     final ThemeData? theme = provider.theme;
     provider.syncFromPrefs();
     return MaterialApp(
-      theme: theme ?? ThemeSettings.lightTheme,
-      darkTheme: theme ?? ThemeSettings.darkTheme,
-      themeMode: ThemeMode.system,
-      routes: getApplicationRoutes(),
-      initialRoute: '/login',
-    );
+        theme: theme ?? ThemeSettings.lightTheme,
+        darkTheme: theme ?? ThemeSettings.darkTheme,
+        themeMode: ThemeMode.system,
+        routes: getApplicationRoutes(),
+        // initialRoute: '/login',
+        home: StreamBuilder(
+          stream: _auth.userChanges,
+          builder: (context, snapshot) {
+            return (snapshot.hasData && !snapshot.data!.isAnonymous)
+                ? const DashboardScreen()
+                : const LoginScreen();
+          },
+        ));
   }
 }

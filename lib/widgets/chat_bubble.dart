@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
 import 'package:linkchat/models/message.dart';
@@ -124,12 +125,19 @@ class LinkPreview extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   message.linkPhotoURL != null
-                      ? FadeInImage(
-                          placeholder: const AssetImage('assets/loading.gif'),
-                          image: NetworkImage(message.linkPhotoURL!),
-                          imageErrorBuilder: (context, error, stackTrace) =>
+                      // ? FadeInImage(
+                      //         placeholder: const AssetImage('assets/loading.gif'),
+                      //         image: NetworkImage(message.linkPhotoURL!),
+                      //         imageErrorBuilder: (context, error, stackTrace) =>
+                      //             const SizedBox.shrink(),
+                      //         fit: BoxFit.fill,
+                      //       )
+                      ? CachedNetworkImage(
+                          imageUrl: message.linkPhotoURL!,
+                          placeholder: (context, url) =>
+                              Image.asset('assets/loading.gif'),
+                          errorWidget: (context, url, error) =>
                               const SizedBox.shrink(),
-                          fit: BoxFit.fill,
                         )
                       : const SizedBox.shrink(),
                   message.linkTitle != null

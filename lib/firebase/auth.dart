@@ -15,6 +15,7 @@ class Auth {
   final Database _db = Database();
 
   User? get currentUser => _auth.currentUser;
+  Stream<User?> get userChanges => _auth.userChanges();
 
   Future<bool> createUserWithEmailAndPassword({
     required String email,

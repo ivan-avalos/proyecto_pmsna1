@@ -26,6 +26,7 @@ dependencies:
   custom_clippers: ^2.0.0
   simple_link_preview: ^1.0.2
   url_launcher: ^6.1.11
+  cached_network_image: ^3.2.3
   intl: ^0.18.1
 
 dev_dependencies:
