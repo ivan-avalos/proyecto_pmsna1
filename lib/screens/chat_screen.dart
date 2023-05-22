@@ -66,9 +66,10 @@ class _ChatScreenState extends State<ChatScreen> {
           if (snapshot.hasData) {
             List<Message> msgs = snapshot.data!;
             return ListView.builder(
+              padding: const EdgeInsets.only(bottom: 80.0),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) => ChatBubble(
-                msgs[index].messageText,
+                msgs[index],
                 alignment: msgs[index].sentBy == _auth.currentUser?.uid
                     ? ChatBubbleAlignment.end
                     : ChatBubbleAlignment.start,
@@ -83,13 +84,24 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       bottomSheet: ChatBottomSheet(
         onPressed: (value) {
-          _db.saveMessage(
-              Message(
-                messageText: value,
-                sentBy: _auth.currentUser!.uid,
-                sentAt: DateTime.now(),
+          if (value.startsWith('https://') && Uri.tryParse(value) != null) {
+            _db.saveMessage(
+                Message(
+                  messageText: value,
+                  sentBy: _auth.currentUser!.uid,
+                  sentAt: DateTime.now(),
+                ),
+                group!.id!);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                // behavior: SnackBarBehavior.floating,
+                dismissDirection: DismissDirection.none,
+                content: Text('El mensaje debe ser un link.'),
+                duration: Duration(seconds: 1),
               ),
-              group!.id!);
+            );
+          }
         },
       ),
     );

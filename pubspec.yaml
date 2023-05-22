@@ -24,6 +24,8 @@ dependencies:
   firebase_storage: ^11.2.1
   cloud_firestore: ^4.7.1
   custom_clippers: ^2.0.0
+  simple_link_preview: ^1.0.2
+  url_launcher: ^6.1.11
   intl: ^0.18.1
 
 dev_dependencies:

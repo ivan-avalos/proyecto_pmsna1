@@ -35,11 +35,10 @@ class RecentChats extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
+                padding: const EdgeInsets.only(bottom: 100.0),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   Group group = snapshot.data![index];
-                  print("Members: ${group.members}");
-                  print("User ID: ${_auth.currentUser!.uid}");
                   return FutureBuilder(
                       future: _db.getUserById(group.members.firstWhere(
                           (m) => m != _auth.currentUser!.uid,

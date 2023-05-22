@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:linkchat/models/group.dart';
 import 'package:linkchat/models/message.dart';
+import 'package:simple_link_preview/simple_link_preview.dart';
 
 import '../models/user.dart';
 
@@ -58,13 +59,14 @@ class Database {
   }
 
   Future<void> saveMessage(Message msg, String groupId) async {
+    LinkPreview? preview = await SimpleLinkPreview.getPreview(msg.messageText);
     await _firestore
         .collection('messages')
         .doc(groupId)
         .collection('messages')
-        .add(msg.toMap());
+        .add(msg.toMap(preview: preview));
     await _firestore.collection('groups').doc(groupId).update({
-      "recentMessage": msg.toMap(),
+      "recentMessage": msg.toMap(preview: preview),
     });
   }
 
