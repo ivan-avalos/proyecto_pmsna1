@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:linkchat/firebase/auth.dart';
 import 'package:linkchat/firebase/database.dart';
 import 'package:linkchat/models/group.dart';
+import 'package:linkchat/widgets/cached_avatar.dart';
 
 import '../models/favorite.dart';
 import '../models/message.dart';
@@ -42,11 +43,12 @@ class _ChatScreenState extends State<ChatScreen> {
             leadingWidth: 30,
             title: Row(
               children: [
-                ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(user!.photoUrl),
-                    )),
+                // ClipRRect(
+                //     borderRadius: BorderRadius.circular(30),
+                //     child: CircleAvatar(
+                //       backgroundImage: NetworkImage(user!.photoUrl),
+                //     )),
+                CachedAvatar(user?.photoUrl),
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: Text(user!.displayName),

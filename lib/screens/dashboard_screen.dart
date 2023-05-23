@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linkchat/widgets/cached_avatar.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase/auth.dart';
@@ -49,11 +50,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: ListView(
           children: [
             UserAccountsDrawerHeader(
-              currentAccountPicture: CircleAvatar(
-                backgroundImage: _auth.currentUser?.photoURL != null
-                    ? NetworkImage(_auth.currentUser!.photoURL!)
-                    : null,
-              ),
+              currentAccountPicture: CachedAvatar(_auth.currentUser?.photoURL),
               accountName: Text(_auth.currentUser?.displayName ?? "Lincite"),
               accountEmail: _auth.currentUser?.email != null
                   ? Text(_auth.currentUser!.email!)

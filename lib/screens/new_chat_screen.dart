@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:linkchat/firebase/database.dart';
 import 'package:linkchat/models/group.dart';
+import 'package:linkchat/widgets/cached_avatar.dart';
 
 import '../firebase/auth.dart';
 import '../models/user.dart';
@@ -71,9 +72,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
               itemBuilder: (context, index) {
                 FsUser user = filteredUsers[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user.photoUrl),
-                  ),
+                  leading: CachedAvatar(user.photoUrl),
                   title: Text(user.displayName),
                   trailing: IconButton(
                     icon: const Icon(Icons.send),
