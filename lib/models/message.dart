@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:simple_link_preview/simple_link_preview.dart';
 
 class Message {
+  final String? id;
   final String messageText;
   final String? linkTitle;
   final String? linkDescription;
@@ -10,6 +11,7 @@ class Message {
   final String sentBy;
 
   const Message({
+    this.id,
     required this.messageText,
     this.linkTitle,
     this.linkDescription,
@@ -29,8 +31,9 @@ class Message {
     };
   }
 
-  factory Message.fromMap(Map<String, dynamic> map) {
+  factory Message.fromMap(Map<String, dynamic> map, String? id) {
     return Message(
+      id: id,
       messageText: map['messageText'],
       linkTitle: map['linkTitle'],
       linkDescription: map['linkDescription'],

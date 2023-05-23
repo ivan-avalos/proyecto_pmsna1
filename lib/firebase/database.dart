@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:linkchat/models/favorite.dart';
 import 'package:linkchat/models/group.dart';
 import 'package:linkchat/models/message.dart';
 import 'package:simple_link_preview/simple_link_preview.dart';
@@ -9,6 +10,10 @@ import '../models/user.dart';
 
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  //
+  // USERS
+  //
 
   Future<FsUser?> getUserById(String uid) async {
     var snap = await _firestore.collection('users').doc(uid).get();
@@ -32,6 +37,10 @@ class Database {
     });
   }
 
+  //
+  // GROUPS
+  //
+
   Stream<List<Group>> getGroupsByUserID(String uid) {
     return _firestore
         .collection('groups')
@@ -44,6 +53,14 @@ class Database {
     });
   }
 
+  Future<void> saveGroup(Group group) async {
+    await _firestore.collection('groups').add(group.toMap());
+  }
+
+  //
+  // MESSAGES
+  //
+
   Stream<List<Message>> getMessagesByGroupId(String id) {
     return _firestore
         .collection('messages')
@@ -53,7 +70,7 @@ class Database {
         .snapshots()
         .map<List<Message>>((e) {
       return e.docs.map((e) {
-        return Message.fromMap(e.data());
+        return Message.fromMap(e.data(), e.id);
       }).toList();
     });
   }
@@ -70,7 +87,47 @@ class Database {
     });
   }
 
-  Future<void> saveGroup(Group group) async {
-    await _firestore.collection('groups').add(group.toMap());
+  //
+  // FAVORITES
+  //
+
+  Stream<List<Favorite>> getFavoritesByUserID(String uid) {
+    return _firestore
+        .collection('favorites')
+        .doc(uid)
+        .collection('favorites')
+        .orderBy('savedAt', descending: true)
+        .snapshots()
+        .map<List<Favorite>>(
+          (e) => e.docs.map((e) => Favorite.fromMap(e.data())).toList(),
+        );
+  }
+
+  Stream<bool> hasFavoriteForMessage(String userId, String? messageId) {
+    return _firestore
+        .collection('favorites')
+        .doc(userId)
+        .collection('favorites')
+        .where('messageId', isEqualTo: messageId)
+        .snapshots()
+        .map<bool>((e) => e.docs.isNotEmpty);
+  }
+
+  Future<void> saveFavorite(Favorite favorite, String userId) {
+    return _firestore
+        .collection('favorites')
+        .doc(userId)
+        .collection('favorites')
+        .add(favorite.toMap());
+  }
+
+  Future<void> removeFavorite(String userId, String? messageId) async {
+    CollectionReference reference =
+        _firestore.collection('favorites').doc(userId).collection('favorites');
+    var favorites =
+        await reference.where('messageId', isEqualTo: messageId).get();
+    for (var e in favorites.docs) {
+      reference.doc(e.id).delete();
+    }
   }
 }

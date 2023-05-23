@@ -36,7 +36,7 @@ class Group {
       id: id,
       name: map['name'],
       recentMessage: map['recentMessage'] != null
-          ? Message.fromMap(map['recentMessage'])
+          ? Message.fromMap(map['recentMessage'], null)
           : null,
       members: members.map((m) => m.toString()).toList(),
       createdBy: map['createdBy'],

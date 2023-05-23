@@ -44,53 +44,57 @@ class _NewChatScreenState extends State<NewChatScreen> {
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Nombre del contacto',
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Nombre del contacto',
+              ),
+              onChanged: (value) {
+                setState(() {
+                  if (value.isNotEmpty) {
+                    filteredUsers = users
+                        .where((user) => user.displayName.contains(value))
+                        .toList();
+                  } else {
+                    filteredUsers = users;
+                  }
+                });
+              },
             ),
-            onChanged: (value) {
-              setState(() {
-                if (value.isNotEmpty) {
-                  filteredUsers = users
-                      .where((user) => user.displayName.contains(value))
-                      .toList();
-                } else {
-                  filteredUsers = users;
-                }
-              });
-            },
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: filteredUsers.length,
-            itemBuilder: (context, index) {
-              FsUser user = filteredUsers[index];
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(user.photoUrl),
-                ),
-                title: Text(user.displayName),
-                trailing: IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () {
-                    _db
-                        .saveGroup(Group(
-                      createdBy: _auth.currentUser!.uid,
-                      createdAt: DateTime.now(),
-                      members: [
-                        _auth.currentUser!.uid,
-                        user.uid,
-                      ],
-                    ))
-                        .whenComplete(() {
-                      Navigator.of(context).pop();
-                    });
-                  },
-                ),
-              );
-            },
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredUsers.length,
+              itemBuilder: (context, index) {
+                FsUser user = filteredUsers[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(user.photoUrl),
+                  ),
+                  title: Text(user.displayName),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () {
+                      _db
+                          .saveGroup(Group(
+                        createdBy: _auth.currentUser!.uid,
+                        createdAt: DateTime.now(),
+                        members: [
+                          _auth.currentUser!.uid,
+                          user.uid,
+                        ],
+                      ))
+                          .whenComplete(() {
+                        Navigator.of(context).pop();
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),

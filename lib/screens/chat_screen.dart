@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:linkchat/firebase/auth.dart';
 import 'package:linkchat/firebase/database.dart';
 import 'package:linkchat/models/group.dart';
 
+import '../models/favorite.dart';
 import '../models/message.dart';
 import '../models/user.dart';
 import '../widgets/chat_bottom_sheet.dart';
@@ -75,16 +77,44 @@ class _ChatScreenState extends State<ChatScreen> {
             });
 
             List<Message> msgs = snapshot.data!;
+            User? user = _auth.currentUser;
             return ListView.builder(
               controller: _scroll,
               padding: const EdgeInsets.only(bottom: 80.0),
               itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) => ChatBubble(
-                msgs[index],
-                alignment: msgs[index].sentBy == _auth.currentUser?.uid
-                    ? ChatBubbleAlignment.end
-                    : ChatBubbleAlignment.start,
-              ),
+              itemBuilder: (context, index) => StreamBuilder(
+                  stream: _db.hasFavoriteForMessage(
+                      _auth.currentUser!.uid, msgs[index].id),
+                  builder: (context, snapshot) {
+                    return ChatBubble(
+                      msgs[index],
+                      alignment: msgs[index].sentBy == user?.uid
+                          ? ChatBubbleAlignment.end
+                          : ChatBubbleAlignment.start,
+                      favorited: snapshot.hasData
+                          ? snapshot.data == true
+                          : (snapshot.hasError ? false : false),
+                      onFavorite: (String id, bool value) {
+                        if (value) {
+                          _db.saveFavorite(
+                              Favorite(
+                                groupId: group!.id!,
+                                messageId: msgs[index].id!,
+                                savedAt: DateTime.now(),
+                                messageText: msgs[index].messageText,
+                                linkTitle: msgs[index].linkTitle,
+                                linkDescription: msgs[index].linkDescription,
+                                linkPhotoURL: msgs[index].linkPhotoURL,
+                                sentAt: msgs[index].sentAt,
+                                sentBy: msgs[index].sentBy,
+                              ),
+                              user!.uid);
+                        } else {
+                          _db.removeFavorite(user!.uid, msgs[index].id);
+                        }
+                      },
+                    );
+                  }),
             );
           } else if (snapshot.hasError) {
             print('Error: ${snapshot.error}');

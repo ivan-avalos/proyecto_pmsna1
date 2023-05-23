@@ -10,11 +10,15 @@ enum ChatBubbleAlignment { start, end }
 class ChatBubble extends StatelessWidget {
   final Message message;
   final ChatBubbleAlignment alignment;
+  final bool favorited;
+  final Function(String id, bool value) onFavorite;
 
   const ChatBubble(
     this.message, {
     super.key,
     required this.alignment,
+    this.favorited = false,
+    required this.onFavorite,
   });
 
   @override
@@ -23,8 +27,16 @@ class ChatBubble extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         alignment == ChatBubbleAlignment.start
-            ? BubbleLeft(message)
-            : BubbleRight(message),
+            ? BubbleLeft(
+                message,
+                favorited: favorited,
+                onFavorite: onFavorite,
+              )
+            : BubbleRight(
+                message,
+                favorited: favorited,
+                onFavorite: onFavorite,
+              ),
       ],
     );
   }
@@ -32,8 +44,15 @@ class ChatBubble extends StatelessWidget {
 
 class BubbleLeft extends StatelessWidget {
   final Message message;
+  final bool favorited;
+  final Function(String id, bool value) onFavorite;
 
-  const BubbleLeft(this.message, {super.key});
+  const BubbleLeft(
+    this.message, {
+    super.key,
+    this.favorited = false,
+    required this.onFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +79,12 @@ class BubbleLeft extends StatelessWidget {
                   ),
                 ),
               ),
+              IconButton(
+                icon: favorited
+                    ? const Icon(Icons.favorite, color: Colors.black)
+                    : const Icon(Icons.favorite_outline, color: Colors.black),
+                onPressed: () => onFavorite(message.id!, !favorited),
+              ),
             ],
           ),
         ),
@@ -70,8 +95,15 @@ class BubbleLeft extends StatelessWidget {
 
 class BubbleRight extends StatelessWidget {
   final Message message;
+  final bool favorited;
+  final Function(String id, bool value) onFavorite;
 
-  const BubbleRight(this.message, {super.key});
+  const BubbleRight(
+    this.message, {
+    super.key,
+    this.favorited = false,
+    required this.onFavorite,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +132,12 @@ class BubbleRight extends StatelessWidget {
                       style: const TextStyle(color: Colors.blue),
                     ),
                   ),
+                ),
+                IconButton(
+                  icon: favorited
+                      ? const Icon(Icons.favorite, color: Colors.white)
+                      : const Icon(Icons.favorite_outline, color: Colors.white),
+                  onPressed: () => onFavorite(message.id!, !favorited),
                 ),
               ],
             ),

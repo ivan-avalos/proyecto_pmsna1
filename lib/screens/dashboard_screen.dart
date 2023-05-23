@@ -30,6 +30,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         slivers: [
           SliverAppBar.large(
             title: const Text('Inicio'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.favorite_outline),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/favorites');
+                },
+              )
+            ],
           ),
           SliverFillRemaining(
             hasScrollBody: true,
