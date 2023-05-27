@@ -1,5 +1,6 @@
 import 'package:concentric_transition/concentric_transition.dart';
 import 'package:flutter/material.dart';
+import 'package:linkchat/settings/preferences.dart';
 import 'package:lottie/lottie.dart';
 
 import '../widgets/responsive.dart';
@@ -95,6 +96,7 @@ class OnboardingScreen extends StatelessWidget {
           );
         },
         onFinish: () {
+          Preferences.setShowOnboarding(false);
           Navigator.of(context).pushNamed('/dash');
         },
       ),

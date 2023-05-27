@@ -158,21 +158,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void onRegisterClicked(BuildContext context) {
     setState(() {
-      isLoading = false;
-      if (validateForm()) {
-        Auth()
-            .createUserWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-          displayName: _nameController.text,
-          avatar: File(_avatar!.path),
-        )
-            .then((success) {
-          if (success) {
-            Navigator.of(context).pushReplacementNamed('/onboard');
-          }
-        });
-      }
+      isLoading = true;
     });
+
+    if (validateForm()) {
+      Auth()
+          .createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+        displayName: _nameController.text,
+        avatar: File(_avatar!.path),
+      )
+          .then((result) {
+        setState(() {
+          isLoading = false;
+        });
+        result.fold((user) {
+          Navigator.of(context).pushReplacementNamed('/login');
+        }, (error) {
+          String message;
+          switch (error.code) {
+            case 'email-already-in-use':
+              message = 'El correo electrónico ya se encuentra en uso';
+            case 'invalid-email':
+              message = 'El correo electrónico es inválido';
+            case 'operation-not-allowed':
+              message = 'La operación no está permitida';
+            case 'weak-password':
+              message = 'La contraseña es muy débil';
+            default:
+              message = 'Ocurrió un error desconocido';
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          );
+        });
+      });
+    }
   }
 }

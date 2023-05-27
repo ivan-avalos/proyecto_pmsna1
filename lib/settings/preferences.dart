@@ -31,4 +31,13 @@ class Preferences {
       }
     });
   }
+
+  static Future<bool> getShowOnboarding() async =>
+      (await prefs).getBool('show-onboarding') ?? true;
+
+  static void setShowOnboarding(bool show) {
+    prefs.then((p) {
+      p.setBool('show-onboarding', show);
+    });
+  }
 }

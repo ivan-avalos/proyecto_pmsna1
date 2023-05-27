@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:linkchat/settings/preferences.dart';
 import 'package:social_login_buttons/social_login_buttons.dart';
 
 import '../firebase/auth.dart';
@@ -19,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen>
   final Auth _auth = Auth();
 
   bool isLoading = false;
+  bool isInit = false;
 
   final padding = 16.0;
   final spacer = const SizedBox(height: 16.0);
@@ -107,40 +110,82 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
   void onLoginClicked(BuildContext context) {
+    setState(() {
+      isLoading = true;
+    });
     _auth
         .signInWithEmailAndPassword(
       email: _emailController.text,
       password: _passwordController.text,
     )
-        .then((success) {
+        .then((result) {
       setState(() {
         isLoading = false;
       });
-      // TODO: checar si el resultado es true
-      Navigator.of(context).pushReplacementNamed('/dash');
+      result.fold(
+        (user) {
+          if (user != null && user.emailVerified == false) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('El correo no está verificado')),
+            );
+          } else {
+            Preferences.getShowOnboarding().then((show) {
+              Navigator.of(context)
+                  .pushReplacementNamed(show ? '/onboard' : '/dash');
+            });
+          }
+        },
+        (error) => handleError(error),
+      );
     });
   }
 
   void onGoogleLoginClicked(BuildContext context) {
-    _auth.signInWithGoogle().then((success) {
+    setState(() {
+      isLoading = true;
+    });
+    _auth.signInWithGoogle().then((result) {
       setState(() {
         isLoading = false;
       });
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('/dash');
-      }
+      result.fold(
+        (user) {},
+        (error) => handleError(error),
+      );
     });
   }
 
   void onGithubLoginClicked(BuildContext context) {
-    _auth.signInWithGithub().then((success) {
+    setState(() {
+      isLoading = true;
+    });
+    _auth.signInWithGithub().then((result) {
       setState(() {
         isLoading = false;
       });
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('/dash');
-      }
+      result.fold(
+        (user) {},
+        (error) => handleError(error),
+      );
     });
+  }
+
+  void handleError(FirebaseException error) {
+    String message;
+    switch (error.code) {
+      case 'invalid-email':
+        message = 'El correo electrónico es inválido';
+      case 'user-disabled':
+        message = 'El usuario está desactivado';
+      case 'user-not-found':
+        message = 'El usuario no existe';
+      case 'wrong-password':
+        message = 'La contraseña es incorrecta.';
+      default:
+        message = 'Ocurrió un error desconocido';
+    }
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

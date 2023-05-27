@@ -109,11 +109,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void signOut(BuildContext context) {
-    /*_auth.signOut().then((success) {
-      if (success) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/login'));
-      }
-    });*/
     _auth.signOut().then((success) {
       if (success) {
         Navigator.of(context).pushReplacementNamed('/login');

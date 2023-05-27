@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:linkchat/firebase/database.dart';
@@ -17,7 +18,7 @@ class Auth {
   User? get currentUser => _auth.currentUser;
   Stream<User?> get userChanges => _auth.userChanges();
 
-  Future<bool> createUserWithEmailAndPassword({
+  Future<Either<User?, FirebaseException>> createUserWithEmailAndPassword({
     required String email,
     required String password,
     required String displayName,
@@ -28,6 +29,10 @@ class Auth {
         email: email,
         password: password,
       );
+
+      // Enviar correo de verificación
+      await cred.user?.sendEmailVerification();
+
       User? user = cred.user;
       if (user != null) {
         String photoUrl = await Storage().uploadAvatar(user.uid, avatar);
@@ -41,46 +46,47 @@ class Auth {
           email: user.email!,
         ));
       }
-      return true;
+      return Left(user);
     } catch (e) {
       if (kDebugMode) print(e);
-      return false;
+      return Right(e as FirebaseException);
     }
   }
 
-  Future<bool> signInWithEmailAndPassword({
+  Future<Either<User?, FirebaseException>> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
     try {
+      await _auth.signOut();
       UserCredential cred = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return cred.user?.emailVerified == true;
+      return Left(cred.user);
     } catch (e) {
       if (kDebugMode) print(e);
-      return false;
+      return Right(e as FirebaseException);
     }
   }
 
-  Future<bool> signInWithGoogle() async {
+  Future<Either<User?, FirebaseException>> signInWithGoogle() async {
     try {
-      await _auth.signInWithProvider(_googleAuthProvider);
-      return true;
+      UserCredential cred = await _auth.signInWithProvider(_googleAuthProvider);
+      return Left(cred.user);
     } catch (e) {
       if (kDebugMode) print(e);
-      return false;
+      return Right(e as FirebaseException);
     }
   }
 
-  Future<bool> signInWithGithub() async {
+  Future<Either<User?, FirebaseException>> signInWithGithub() async {
     try {
-      await _auth.signInWithProvider(_githubProvider);
-      return true;
+      UserCredential cred = await _auth.signInWithProvider(_githubProvider);
+      return Left(cred.user);
     } catch (e) {
       if (kDebugMode) print(e);
-      return false;
+      return Right(e as FirebaseException);
     }
   }
 
