@@ -56,38 +56,21 @@ class BubbleLeft extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color background = Theme.of(context).colorScheme.tertiaryContainer;
+    Color foreground = Theme.of(context).colorScheme.onTertiaryContainer;
     return Padding(
-      padding: const EdgeInsets.only(right: 77),
+      padding: const EdgeInsets.only(top: 10, right: 77),
       child: ClipPath(
         clipper: UpperNipMessageClipper(MessageType.receive),
         child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            color: Color(0xFFE1E1E2),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LinkPreview(message),
-              Link(
-                uri: Uri.parse(message.messageText),
-                builder: (context, followLink) => TextButton(
-                  onPressed: followLink,
-                  child: Text(
-                    message.messageText,
-                    style: const TextStyle(color: Colors.blue),
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: favorited
-                    ? const Icon(Icons.favorite, color: Colors.black)
-                    : const Icon(Icons.favorite_outline, color: Colors.black),
-                onPressed: () => onFavorite(message.id!, !favorited),
-              ),
-            ],
-          ),
-        ),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(color: background),
+            child: BubbleContent(
+              message,
+              favorited: favorited,
+              foregroundColor: foreground,
+              onFavorited: () => onFavorite(message.id!, !favorited),
+            )),
       ),
     );
   }
@@ -107,43 +90,100 @@ class BubbleRight extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color background = Theme.of(context).colorScheme.primaryContainer;
+    Color foreground = Theme.of(context).colorScheme.onPrimaryContainer;
     return Container(
       alignment: Alignment.centerRight,
       child: Padding(
-        padding: const EdgeInsets.only(top: 20, left: 77),
+        padding: const EdgeInsets.only(top: 10, left: 77),
         child: ClipPath(
           clipper: LowerNipMessageClipper(MessageType.send),
           child: Container(
-            padding:
-                const EdgeInsets.only(left: 20, top: 10, bottom: 20, right: 20),
-            decoration: const BoxDecoration(
-              color: Color(0xFF113753),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LinkPreview(message),
-                Link(
-                  uri: Uri.parse(message.messageText),
-                  builder: (context, followLink) => TextButton(
-                    onPressed: followLink,
-                    child: Text(
-                      message.messageText,
-                      style: const TextStyle(color: Colors.blue),
+              padding: const EdgeInsets.only(
+                  left: 20, top: 10, bottom: 20, right: 20),
+              decoration: BoxDecoration(color: background),
+              child: BubbleContent(
+                message,
+                favorited: favorited,
+                foregroundColor: foreground,
+                onFavorited: () => onFavorite(message.id!, !favorited),
+              )),
+        ),
+      ),
+    );
+  }
+}
+
+class BubbleContent extends StatelessWidget {
+  final bool favorited;
+  final Message message;
+  final Color foregroundColor;
+  final Function() onFavorited;
+
+  const BubbleContent(
+    this.message, {
+    super.key,
+    required this.favorited,
+    required this.foregroundColor,
+    required this.onFavorited,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LinkPreview(message),
+        Row(
+          children: [
+            Expanded(
+              child: Link(
+                uri: Uri.parse(message.messageText),
+                builder: (context, followLink) => TextButton(
+                  onPressed: followLink,
+                  child: Text(
+                    message.messageText,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                      color: foregroundColor,
+                      decoration: TextDecoration.underline,
+                      decorationColor: foregroundColor,
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: favorited
-                      ? const Icon(Icons.favorite, color: Colors.white)
-                      : const Icon(Icons.favorite_outline, color: Colors.white),
-                  onPressed: () => onFavorite(message.id!, !favorited),
-                ),
-              ],
+              ),
             ),
-          ),
+            Favorited(
+              favorited,
+              color: foregroundColor,
+              onPressed: () => onFavorited(),
+            ),
+          ],
         ),
-      ),
+      ],
+    );
+  }
+}
+
+class Favorited extends StatelessWidget {
+  final bool favorited;
+  final Color color;
+  final Function() onPressed;
+
+  const Favorited(
+    this.favorited, {
+    super.key,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: favorited
+          ? Icon(Icons.favorite, color: color)
+          : Icon(Icons.favorite_outline, color: color),
+      onPressed: onPressed,
     );
   }
 }

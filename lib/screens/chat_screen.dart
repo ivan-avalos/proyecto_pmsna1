@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linkchat/firebase/auth.dart';
 import 'package:linkchat/firebase/database.dart';
@@ -43,11 +44,6 @@ class _ChatScreenState extends State<ChatScreen> {
             leadingWidth: 30,
             title: Row(
               children: [
-                // ClipRRect(
-                //     borderRadius: BorderRadius.circular(30),
-                //     child: CircleAvatar(
-                //       backgroundImage: NetworkImage(user!.photoUrl),
-                //     )),
                 CachedAvatar(user?.photoUrl),
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
@@ -119,7 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   }),
             );
           } else if (snapshot.hasError) {
-            print('Error: ${snapshot.error}');
+            if (kDebugMode) print('Error: ${snapshot.error}');
             return const Center(child: Text('Hubo un error'));
           }
           return const Center(child: CircularProgressIndicator());

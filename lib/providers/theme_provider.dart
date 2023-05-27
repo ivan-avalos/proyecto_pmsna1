@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../settings/preferences.dart';
+import '../settings/themes.dart';
 
 class ThemeProvider with ChangeNotifier {
   bool synced = false;
-  ThemeData? _theme;
+  ThemeEnum _theme = ThemeEnum.auto;
 
   void syncFromPrefs() {
     if (synced) return;
@@ -15,9 +16,9 @@ class ThemeProvider with ChangeNotifier {
     });
   }
 
-  ThemeData? get theme => _theme;
+  ThemeEnum get theme => _theme;
 
-  set theme(ThemeData? theme) {
+  set theme(ThemeEnum theme) {
     Preferences.setTheme(theme);
     _theme = theme;
     notifyListeners();

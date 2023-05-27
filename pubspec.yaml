@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  dynamic_color: ^1.6.5
   provider: ^6.0.5
   shared_preferences: ^2.1.1
   lottie: ^2.3.2

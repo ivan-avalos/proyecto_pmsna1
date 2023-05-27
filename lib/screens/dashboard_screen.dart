@@ -51,29 +51,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             UserAccountsDrawerHeader(
               currentAccountPicture: CachedAvatar(_auth.currentUser?.photoURL),
-              accountName: Text(_auth.currentUser?.displayName ?? "Lincite"),
+              accountName: Text(
+                _auth.currentUser?.displayName ?? "Lincite",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
               accountEmail: _auth.currentUser?.email != null
-                  ? Text(_auth.currentUser!.email!)
+                  ? Text(
+                      _auth.currentUser!.email!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    )
                   : null,
             ),
             ListTile(
               title: const Text('Tema'),
-              trailing: SegmentedButton<ThemeData?>(
-                segments: [
-                  const ButtonSegment<ThemeData?>(
-                    value: null,
+              trailing: SegmentedButton<ThemeEnum>(
+                segments: const [
+                  ButtonSegment<ThemeEnum>(
+                    value: ThemeEnum.auto,
                     icon: Icon(Icons.brightness_auto),
                   ),
-                  ButtonSegment<ThemeData?>(
-                    value: ThemeSettings.lightTheme,
-                    icon: const Icon(Icons.light_mode),
+                  ButtonSegment<ThemeEnum>(
+                    value: ThemeEnum.light,
+                    icon: Icon(Icons.light_mode),
                   ),
-                  ButtonSegment<ThemeData?>(
-                      value: ThemeSettings.darkTheme,
-                      icon: const Icon(Icons.dark_mode)),
+                  ButtonSegment<ThemeEnum>(
+                    value: ThemeEnum.dark,
+                    icon: Icon(Icons.dark_mode),
+                  ),
                 ],
-                selected: <ThemeData?>{themeProvider.theme},
-                onSelectionChanged: ((Set<ThemeData?> newSelection) {
+                selected: <ThemeEnum>{themeProvider.theme},
+                onSelectionChanged: ((Set<ThemeEnum> newSelection) {
                   themeProvider.theme = newSelection.first;
                 }),
               ),

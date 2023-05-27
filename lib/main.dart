@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:linkchat/screens/dashboard_screen.dart';
@@ -50,20 +51,35 @@ class LinkChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeProvider provider = context.watch<ThemeProvider>();
-    final ThemeData? theme = provider.theme;
-    provider.syncFromPrefs();
+    final ThemeEnum themeEnum = provider.theme;
+
     return StreamBuilder(
         stream: _auth.userChanges,
-        builder: (context, snapshot) {
-          return MaterialApp(
-            theme: theme ?? ThemeSettings.lightTheme,
-            darkTheme: theme ?? ThemeSettings.darkTheme,
-            themeMode: ThemeMode.system,
-            routes: getApplicationRoutes(),
-            home: (snapshot.hasData && !snapshot.data!.isAnonymous)
-                ? const DashboardScreen()
-                : const LoginScreen(),
-          );
-        });
+        builder: (context, snapshot) =>
+            DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
+              provider.syncFromPrefs();
+              ThemeData lightTheme = ThemeSettings.lightTheme(lightDynamic);
+              ThemeData darkTheme = ThemeSettings.darkTheme(darkDynamic);
+              ThemeData? theme;
+              switch (themeEnum) {
+                case ThemeEnum.light:
+                  theme = lightTheme;
+                case ThemeEnum.dark:
+                  theme = darkTheme;
+                case ThemeEnum.auto:
+                  theme = null;
+              }
+              return MaterialApp(
+                theme: theme ?? lightTheme,
+                darkTheme: theme ?? darkTheme,
+                //theme: theme ?? ThemeSettings.lightTheme(lightDynamic),
+                //darkTheme: theme ?? ThemeSettings.darkTheme(darkDynamic),
+                themeMode: ThemeMode.system,
+                routes: getApplicationRoutes(),
+                home: (snapshot.hasData && !snapshot.data!.isAnonymous)
+                    ? const DashboardScreen()
+                    : const LoginScreen(),
+              );
+            }));
   }
 }

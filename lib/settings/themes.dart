@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 
-class ThemeSettings {
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    primaryColor: Colors.purple,
-    fontFamily: 'Manrope',
-  );
+enum ThemeEnum { light, dark, auto }
 
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    fontFamily: 'Manrope',
-    colorScheme: const ColorScheme.dark().copyWith(
-      primary: Colors.purple,
-    ),
-  );
+class ThemeSettings {
+  static ThemeData lightTheme(ColorScheme? lightDynamic) => ThemeData(
+        useMaterial3: true,
+        primaryColor: Colors.purple,
+        fontFamily: 'Manrope',
+        colorScheme: lightDynamic,
+      );
+
+  static ThemeData darkTheme(ColorScheme? darkDynamic) => ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        fontFamily: 'Manrope',
+        primaryColor: Colors.purple,
+        colorScheme: (darkDynamic ?? const ColorScheme.dark()),
+      );
 }

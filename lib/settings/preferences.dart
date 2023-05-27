@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../settings/themes.dart';
@@ -11,21 +10,21 @@ class Preferences {
     return _prefs!;
   }
 
-  static Future<ThemeData?> getTheme() async {
+  static Future<ThemeEnum> getTheme() async {
     switch ((await prefs).getString('theme')) {
       case 'light':
-        return ThemeSettings.lightTheme;
+        return ThemeEnum.light;
       case 'dark':
-        return ThemeSettings.darkTheme;
+        return ThemeEnum.dark;
     }
-    return null;
+    return ThemeEnum.auto;
   }
 
-  static void setTheme(ThemeData? theme) {
+  static void setTheme(ThemeEnum? theme) {
     prefs.then((p) {
-      if (theme == ThemeSettings.lightTheme) {
+      if (theme == ThemeEnum.light) {
         p.setString('theme', 'light');
-      } else if (theme == ThemeSettings.darkTheme) {
+      } else if (theme == ThemeEnum.dark) {
         p.setString('theme', 'dark');
       } else {
         p.remove('theme');
