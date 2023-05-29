@@ -17,12 +17,11 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  bool isLoading = false;
+  final ValueNotifier<bool> _loadingNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<XFile?> _avatarNotifier = ValueNotifier<XFile?>(null);
 
   final padding = 16.0;
   final spacer = const SizedBox(height: 16.0);
-
-  XFile? _avatar;
 
   // TextField controllers
   late TextEditingController _nameController;
@@ -40,7 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   bool validateForm() {
-    if (_formKey.currentState!.validate() && _avatar != null) {
+    if (_formKey.currentState!.validate() && _avatarNotifier.value != null) {
       return true;
     }
     return false;
@@ -72,13 +71,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                AvatarPicker(
-                                  avatar: _avatar,
-                                  onAvatarPicked: (avatar) {
-                                    setState(() {
-                                      _avatar = avatar;
-                                    });
-                                  },
+                                ValueListenableBuilder(
+                                  valueListenable: _avatarNotifier,
+                                  builder: (context, value, child) =>
+                                      AvatarPicker(
+                                    avatar: _avatarNotifier.value,
+                                    onAvatarPicked: (avatar) {
+                                      _avatarNotifier.value = avatar;
+                                    },
+                                  ),
                                 ),
                                 spacer,
                                 TextFormField(
@@ -147,7 +148,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                 ),
-                isLoading ? const LoadingModal() : const SizedBox.shrink(),
+                ValueListenableBuilder(
+                  valueListenable: _loadingNotifier,
+                  builder: (context, value, child) =>
+                      value ? const LoadingModal() : const SizedBox.shrink(),
+                ),
               ],
             ),
           )
@@ -157,22 +162,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void onRegisterClicked(BuildContext context) {
-    setState(() {
-      isLoading = true;
-    });
-
+    _loadingNotifier.value = true;
     if (validateForm()) {
       Auth()
           .createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
         displayName: _nameController.text,
-        avatar: File(_avatar!.path),
+        avatar: File(_avatarNotifier.value!.path),
       )
           .then((result) {
-        setState(() {
-          isLoading = false;
-        });
+        _loadingNotifier.value = false;
         result.fold((user) {
           Navigator.of(context).pushReplacementNamed('/login');
         }, (error) {

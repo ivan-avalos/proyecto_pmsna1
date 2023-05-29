@@ -17,17 +17,17 @@ class _NewChatScreenState extends State<NewChatScreen> {
   final Auth _auth = Auth();
   final Database _db = Database();
   final TextEditingController _controller = TextEditingController();
-  List<FsUser> users = [];
-  List<FsUser> filteredUsers = [];
+  final ValueNotifier<List<FsUser>> _usersNotifier =
+      ValueNotifier<List<FsUser>>([]);
+  final ValueNotifier<List<FsUser>> _filteredUsersNotifier =
+      ValueNotifier<List<FsUser>>([]);
 
   @override
   void initState() {
     super.initState();
     _db.getAllUsers().first.then((u) {
-      setState(() {
-        users = u;
-        filteredUsers = u;
-      });
+      _usersNotifier.value = u;
+      _filteredUsersNotifier.value = u;
     });
   }
 
@@ -54,45 +54,46 @@ class _NewChatScreenState extends State<NewChatScreen> {
                 labelText: 'Nombre del contacto',
               ),
               onChanged: (value) {
-                setState(() {
-                  if (value.isNotEmpty) {
-                    filteredUsers = users
-                        .where((user) => user.displayName.contains(value))
-                        .toList();
-                  } else {
-                    filteredUsers = users;
-                  }
-                });
+                if (value.isNotEmpty) {
+                  _filteredUsersNotifier.value = _usersNotifier.value
+                      .where((user) => user.displayName.contains(value))
+                      .toList();
+                } else {
+                  _filteredUsersNotifier.value = _usersNotifier.value;
+                }
               },
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredUsers.length,
-              itemBuilder: (context, index) {
-                FsUser user = filteredUsers[index];
-                return ListTile(
-                  leading: CachedAvatar(user.photoUrl),
-                  title: Text(user.displayName),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      _db
-                          .saveGroup(Group(
-                        createdBy: _auth.currentUser!.uid,
-                        createdAt: DateTime.now(),
-                        members: [
-                          _auth.currentUser!.uid,
-                          user.uid,
-                        ],
-                      ))
-                          .whenComplete(() {
-                        Navigator.of(context).pop();
-                      });
-                    },
-                  ),
-                );
-              },
+            child: ValueListenableBuilder(
+              valueListenable: _filteredUsersNotifier,
+              builder: (context, value, child) => ListView.builder(
+                itemCount: value.length,
+                itemBuilder: (context, index) {
+                  FsUser user = value[index];
+                  return ListTile(
+                    leading: CachedAvatar(user.photoUrl),
+                    title: Text(user.displayName),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: () {
+                        _db
+                            .saveGroup(Group(
+                          createdBy: _auth.currentUser!.uid,
+                          createdAt: DateTime.now(),
+                          members: [
+                            _auth.currentUser!.uid,
+                            user.uid,
+                          ],
+                        ))
+                            .whenComplete(() {
+                          Navigator.of(context).pop();
+                        });
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],

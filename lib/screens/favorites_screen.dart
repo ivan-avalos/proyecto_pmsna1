@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:linkchat/firebase/database.dart';
 import 'package:linkchat/widgets/chat_bubble.dart';
@@ -16,19 +17,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   final Auth _auth = Auth();
   final Database _db = Database();
   final TextEditingController _controller = TextEditingController();
-  List<Favorite> favorites = [];
-  List<Favorite> filteredFavorites = [];
+  final ValueNotifier<List<Favorite>> _favoritesNotifier =
+      ValueNotifier<List<Favorite>>([]);
+  final ValueNotifier<List<Favorite>> _filteredFavoritesNotifier =
+      ValueNotifier<List<Favorite>>([]);
 
   @override
   void initState() {
     super.initState();
     _db.getFavoritesByUserID(_auth.currentUser!.uid).first.then((f) {
-      setState(() {
-        favorites = f;
-        filteredFavorites = f;
-      });
+      _favoritesNotifier.value = f;
+      _filteredFavoritesNotifier.value = f;
     }).onError((e, st) {
-      print(e);
+      if (kDebugMode) print(e);
     });
   }
 
@@ -55,28 +56,29 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 labelText: 'Buscar',
               ),
               onChanged: (value) {
-                setState(() {
-                  if (value.isNotEmpty) {
-                    filteredFavorites = favorites
-                        .where((fav) =>
-                            fav.messageText.contains(value) == true ||
-                            fav.linkTitle?.contains(value) == true ||
-                            fav.linkDescription?.contains(value) == true)
-                        .toList();
-                  } else {
-                    filteredFavorites = favorites;
-                  }
-                });
+                if (value.isNotEmpty) {
+                  _filteredFavoritesNotifier.value = _favoritesNotifier.value
+                      .where((fav) =>
+                          fav.messageText.contains(value) == true ||
+                          fav.linkTitle?.contains(value) == true ||
+                          fav.linkDescription?.contains(value) == true)
+                      .toList();
+                } else {
+                  _filteredFavoritesNotifier.value = _favoritesNotifier.value;
+                }
               },
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: filteredFavorites.length,
-              itemBuilder: (context, index) {
-                Favorite fav = filteredFavorites[index];
-                return LinkPreview(fav.getMessage());
-              },
+            child: ValueListenableBuilder(
+              valueListenable: _filteredFavoritesNotifier,
+              builder: (context, value, child) => ListView.builder(
+                itemCount: value.length,
+                itemBuilder: (context, index) {
+                  Favorite fav = value[index];
+                  return LinkPreview(fav.getMessage());
+                },
+              ),
             ),
           ),
         ],

@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   final Auth _auth = Auth();
 
-  bool isLoading = false;
+  final ValueNotifier<bool> _loadingNotifier = ValueNotifier<bool>(false);
   bool isInit = false;
 
   final padding = 16.0;
@@ -110,18 +110,14 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
   void onLoginClicked(BuildContext context) {
-    setState(() {
-      isLoading = true;
-    });
+    _loadingNotifier.value = true;
     _auth
         .signInWithEmailAndPassword(
       email: _emailController.text,
       password: _passwordController.text,
     )
         .then((result) {
-      setState(() {
-        isLoading = false;
-      });
+      _loadingNotifier.value = false;
       result.fold(
         (user) {
           if (user != null && user.emailVerified == false) {
@@ -141,13 +137,9 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void onGoogleLoginClicked(BuildContext context) {
-    setState(() {
-      isLoading = true;
-    });
+    _loadingNotifier.value = true;
     _auth.signInWithGoogle().then((result) {
-      setState(() {
-        isLoading = false;
-      });
+      _loadingNotifier.value = false;
       result.fold(
         (user) {},
         (error) => handleError(error),
@@ -156,13 +148,9 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void onGithubLoginClicked(BuildContext context) {
-    setState(() {
-      isLoading = true;
-    });
+    _loadingNotifier.value = true;
     _auth.signInWithGithub().then((result) {
-      setState(() {
-        isLoading = false;
-      });
+      _loadingNotifier.value = false;
       result.fold(
         (user) {},
         (error) => handleError(error),
@@ -208,7 +196,11 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
           ),
-          isLoading ? const LoadingModal() : const SizedBox.shrink(),
+          ValueListenableBuilder(
+            valueListenable: _loadingNotifier,
+            builder: (context, value, child) =>
+                value ? const LoadingModal() : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
